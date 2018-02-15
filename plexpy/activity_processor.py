@@ -83,7 +83,9 @@ class ActivityProcessor(object):
                       'transcode_audio_channels': session['transcode_audio_channels'],
                       'transcode_width': session['transcode_width'],
                       'transcode_height': session['transcode_height'],
-                      'stopped': None
+                      'stopped': None,
+                      'audio_language': session['audio_language'],
+                      'subtitle_language': session['subtitle_language']
                       }
 
             # Add ip_address back into values
@@ -289,8 +291,8 @@ class ActivityProcessor(object):
                         'duration, width, height, container, video_codec, audio_codec, bitrate, video_resolution, ' \
                         'video_framerate, aspect_ratio, audio_channels, transcode_protocol, transcode_container, ' \
                         'transcode_video_codec, transcode_audio_codec, transcode_audio_channels, transcode_width, ' \
-                        'transcode_height, transcode_decision) VALUES ' \
-                        '(last_insert_rowid(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                        'transcode_height, transcode_decision, audio_language, subtitle_language) VALUES ' \
+                        '(last_insert_rowid(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 
                 args = [session['rating_key'], session['video_decision'], session['audio_decision'],
                         metadata['duration'], metadata['width'], metadata['height'], metadata['container'],
@@ -299,7 +301,7 @@ class ActivityProcessor(object):
                         metadata['audio_channels'], session['transcode_protocol'], session['transcode_container'],
                         session['transcode_video_codec'], session['transcode_audio_codec'],
                         session['transcode_audio_channels'], session['transcode_width'], session['transcode_height'],
-                        session['transcode_decision']]
+                        session['transcode_decision'], session['audio_language'], session['subtitle_language']]
 
                 # logger.debug(u"PlexPy ActivityProcessor :: Writing session_history_media_info transaction...")
                 self.db.action(query=query, args=args)

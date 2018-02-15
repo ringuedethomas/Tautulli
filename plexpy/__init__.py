@@ -676,6 +676,22 @@ def dbcheck():
             'ALTER TABLE sessions ADD COLUMN year INTEGER'
         )
 
+    try:
+        c_db.execute('SELECT audio_language FROM sessions')
+    except sqlite3.OperationalError:
+        logger.debug(u"Altering database. Updating database table sessions.")
+        c_db.execute(
+            'ALTER TABLE sessions ADD COLUMN audio_language TEXT'
+        )
+
+    try:
+        c_db.execute('SELECT subtitle_language FROM sessions')
+    except sqlite3.OperationalError:
+        logger.debug(u"Altering database. Updating database table sessions.")
+        c_db.execute(
+            'ALTER TABLE sessions ADD COLUMN subtitle_language TEXT'
+        )
+
     # Upgrade session_history table from earlier versions
     try:
         c_db.execute('SELECT reference_id FROM session_history')
@@ -748,6 +764,22 @@ def dbcheck():
 		    'WHEN video_decision = "transcode" OR audio_decision = "transcode" THEN "transcode" '
 			'WHEN video_decision = "copy" OR audio_decision = "copy" THEN "copy" '
 			'WHEN video_decision = "direct play" OR audio_decision = "direct play" THEN "direct play" END)'
+        )
+
+    try:
+        c_db.execute('SELECT audio_language FROM session_history_media_info')
+    except sqlite3.OperationalError:
+        logger.debug(u"Altering database. Updating database table session_history_media_info.")
+        c_db.execute(
+            'ALTER TABLE session_history_media_info ADD COLUMN audio_language TEXT'
+        )
+
+    try:
+        c_db.execute('SELECT subtitle_language FROM session_history_media_info')
+    except sqlite3.OperationalError:
+        logger.debug(u"Altering database. Updating database table session_history_media_info.")
+        c_db.execute(
+            'ALTER TABLE session_history_media_info ADD COLUMN subtitle_language TEXT'
         )
 
     # Upgrade users table from earlier versions

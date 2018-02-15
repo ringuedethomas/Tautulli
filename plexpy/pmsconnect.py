@@ -1215,6 +1215,16 @@ class PmsConnect(object):
             else:
                 transcode_decision = 'direct play'
 
+            audio_language = ''
+            subtitle_language = ''
+            if media_info.getElementsByTagName('Stream'):
+                for stream in media_info.getElementsByTagName('Stream'):
+                    streamType = int(helpers.get_xml_attr(stream, 'streamType'))
+                    if streamType == 2:
+                        audio_language = helpers.get_xml_attr(stream, 'language')
+                    elif streamType == 3:
+                        subtitle_language = helpers.get_xml_attr(stream, 'language')
+
             if media_info.getElementsByTagName('Part'):
                 indexes = helpers.get_xml_attr(media_info.getElementsByTagName('Part')[0], 'indexes')
                 part_id = helpers.get_xml_attr(media_info.getElementsByTagName('Part')[0], 'id')
@@ -1302,7 +1312,9 @@ class PmsConnect(object):
                                   'duration': duration,
                                   'view_offset': progress,
                                   'progress_percent': str(helpers.get_percent(progress, duration)),
-                                  'indexes': use_indexes
+                                  'indexes': use_indexes,
+                                  'audio_language': audio_language,
+                                  'subtitle_language': subtitle_language
                                   }
                 if helpers.get_xml_attr(session, 'ratingKey').isdigit():
                     session_output['media_type'] = helpers.get_xml_attr(session, 'type')
@@ -1366,7 +1378,9 @@ class PmsConnect(object):
                                   'duration': duration,
                                   'view_offset': progress,
                                   'progress_percent': str(helpers.get_percent(progress, duration)),
-                                  'indexes': use_indexes
+                                  'indexes': use_indexes,
+                                  'audio_language': audio_language,
+                                  'subtitle_language': subtitle_language
                                   }
                 if helpers.get_xml_attr(session, 'ratingKey').isdigit():
                     session_output['media_type'] = helpers.get_xml_attr(session, 'type')
