@@ -989,3 +989,72 @@ class Graphs(object):
                   'series': [series_1_output, series_2_output, series_3_output]}
 
         return output
+
+    def get_top_10_audio_subtitle_preference(self, time_range='30', y_axis='plays', user_id=None):
+        monitor_db = database.MonitorDatabase()
+
+        if not time_range.isdigit():
+            time_range = '30'
+
+        user_cond = ''
+        if session.get_session_user_id() and user_id and user_id != str(session.get_session_user_id()):
+            user_cond = 'AND session_history.user_id = %s ' % session.get_session_user_id()
+        elif user_id and user_id.isdigit():
+            user_cond = 'AND session_history.user_id = %s ' % user_id
+        
+        if y_axis == 'plays':
+            query = "SELECT " \
+                    "COUNT(session_history.id) AS total_count, " \
+                    "SUM(CASE WHEN session_history.media_type = 'episode' THEN 1 ELSE 0 END) AS tv_count, " \
+                    "SUM(CASE WHEN session_history.media_type = 'movie' THEN 1 ELSE 0 END) AS movie_count, " \
+                    "audio_language AS audio_language, " \
+                    "subtitle_language AS subtitle_language " \
+                    "FROM session_history " \
+                    "INNER JOIN session_history_media_info ON session_history.id = session_history_media_info.id " \
+                    "INNER JOIN session_history_metadata ON (session_history_metadata.id = session_history.id) " \
+                    "WHERE audio_language != '' " \
+                    "AND (datetime(stopped, 'unixepoch', 'localtime') >= datetime('now', '-%s days', 'localtime')) %s " \
+                    "GROUP BY audio_language, subtitle_language LIMIT 10" % (time_range, user_cond)
+        else:
+            query = "SELECT " \
+                    'SUM(CASE WHEN session_history.media_type = "episode" AND stopped > 0 THEN (stopped - started) ' \
+                        ' - (CASE WHEN paused_counter IS NULL THEN 0 ELSE paused_counter END) ELSE 0 END) AS tv_count, ' \
+                    'SUM(CASE WHEN session_history.media_type = "movie" AND stopped > 0 THEN (stopped - started) ' \
+                        ' - (CASE WHEN paused_counter IS NULL THEN 0 ELSE paused_counter END) ELSE 0 END) AS movie_count, ' \
+                    'SUM(CASE WHEN stopped > 0 THEN (stopped - started) ' \
+                        ' - (CASE WHEN paused_counter IS NULL THEN 0 ELSE paused_counter END) ELSE 0 END) AS total_duration, ' \
+                    "audio_language AS audio_language, " \
+                    "subtitle_language AS subtitle_language " \
+                    "FROM session_history " \
+                    "INNER JOIN session_history_media_info ON session_history.id = session_history_media_info.id " \
+                    "INNER JOIN session_history_metadata ON (session_history_metadata.id = session_history.id) " \
+                    "WHERE audio_language != '' " \
+                    "AND (datetime(stopped, 'unixepoch', 'localtime') >= datetime('now', '-%s days', 'localtime')) %s " \
+                    "GROUP BY audio_language, subtitle_language LIMIT 10" % (time_range, user_cond)
+        try:
+            result = monitor_db.select(query)
+        except Exception as e:
+            logger.warn(u"PlexPy Graphs :: Unable to execute database query for get_stream_type_by_top_10_users: %s." % e)
+            return None
+        
+        categories = []
+        series_1 = []
+        series_2 = []
+        series_3 = []
+
+        for item in result:
+            subtitleLabel = item['subtitle_language'] if item['subtitle_language'] != '' else 'None'
+            categoryLabel = item['audio_language'] + '/' + subtitleLabel
+            if categoryLabel not in categories:
+                categories.append(categoryLabel)
+            series_1.append(item['tv_count'])
+            series_2.append(item['movie_count'])
+
+        series_1_output = {'name': 'TV',
+                           'data': series_1}
+        series_2_output = {'name': 'Movies',
+                           'data': series_2}
+
+        output = {'categories': categories, 'series': [series_1_output, series_2_output]}
+
+        return output

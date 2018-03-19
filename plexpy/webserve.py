@@ -1653,6 +1653,8 @@ class WebInterface(object):
                           ("platform", True, True),
                           ("player", True, True),
                           ("full_title", True, True),
+                          ("audio_language", True, True),
+                          ("subtitle_language", True, True),
                           ("started", True, False),
                           ("paused_counter", True, False),
                           ("stopped", True, False),
@@ -2124,6 +2126,17 @@ class WebInterface(object):
         else:
             logger.warn(u"Unable to retrieve data for get_plays_by_stream_resolution.")
 
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    @requireAuth()
+    @addtoapi()
+    def get_top_10_audio_subtitle_preference(self, time_range='30', y_axis='plays', user_id=None, **kwargs):
+        graph = graphs.Graphs()
+        result = graph.get_top_10_audio_subtitle_preference(time_range=time_range, y_axis=y_axis, user_id=user_id)
+        if result:
+            return result
+        else:
+            logger.warn(u"Unable to retrieve data for get_top_10_audio_subtitle_preference.")
     @cherrypy.expose
     @cherrypy.tools.json_out()
     @requireAuth()

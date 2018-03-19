@@ -94,7 +94,9 @@ class DataFactory(object):
             'COUNT(*) AS group_count',
             'GROUP_CONCAT(session_history.id) AS group_ids',
             'NULL AS state',
-            'NULL AS session_key'
+            'NULL AS session_key',
+            'session_history_media_info.audio_language',
+            'session_history_media_info.subtitle_language'
             ]
 
         if plexpy.CONFIG.HISTORY_TABLE_ACTIVITY:
@@ -228,7 +230,9 @@ class DataFactory(object):
                    'group_count': item['group_count'],
                    'group_ids': item['group_ids'],
                    'state': item['state'],
-                   'session_key': item['session_key']
+                   'session_key': item['session_key'],
+                   'audio_language': item['audio_language'],
+                   'subtitle_language': item['subtitle_language']
                    }
 
             rows.append(row)

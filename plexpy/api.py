@@ -503,6 +503,9 @@ class Api(object):
         elif playtype == 'total_plays_by_top_10_platforms':
             result = graph.get_total_plays_by_top_10_platforms(time_range=time_range, y_axis=y_axis)
 
+        elif playtype == 'get_top_10_audio_subtitle_preference':
+            result = graph.get_top_10_audio_subtitle_preference(time_range=time_range, y_axis=y_axis)
+
         if result:
             self.data = result
             return result

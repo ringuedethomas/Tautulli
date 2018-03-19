@@ -172,9 +172,35 @@ history_table_options = {
             },
             "width": "33%",
             "className": "datatable-wrap"
-},
+        },
         {
             "targets": [7],
+            "data":"audio_language",
+            "createdCell": function (td, cellData, rowData, row, col) {
+                if (cellData !== '') {
+                    $(td).html(cellData);
+                }
+            },
+            "searchable": false,
+            "width": "5%",
+            "className": "no-wrap"
+        },
+        {
+            "targets": [8],
+            "data":"subtitle_language",
+            "createdCell": function (td, cellData, rowData, row, col) {
+                if (cellData !== '') {
+                    $(td).html(cellData);
+                } else {
+                    $(td).html('None');
+                }
+            },
+            "searchable": false,
+            "width": "5%",
+            "className": "no-wrap"
+        },
+        {
+            "targets": [9],
             "data":"started",
             "createdCell": function (td, cellData, rowData, row, col) {
                 if (cellData === null) {
@@ -188,7 +214,7 @@ history_table_options = {
             "className": "no-wrap"
         },
         {
-            "targets": [8],
+            "targets": [10],
             "data":"paused_counter",
             "render": function (data, type, full) {
                 if (data !== null) {
@@ -202,7 +228,7 @@ history_table_options = {
             "className": "no-wrap"
         },
         {
-            "targets": [9],
+            "targets": [11],
             "data":"stopped",
             "createdCell": function (td, cellData, rowData, row, col) {
                 if (cellData === null) {
@@ -216,7 +242,7 @@ history_table_options = {
             "className": "no-wrap"
         },
         {
-            "targets": [10],
+            "targets": [12],
             "data":"duration",
             "render": function (data, type, full) {
                 if (data !== null) {
@@ -230,7 +256,7 @@ history_table_options = {
             "className": "no-wrap"
         },
         {
-            "targets": [11],
+            "targets": [13],
             "data": "watched_status",
             "createdCell": function (td, cellData, rowData, row, col) {
                 if (cellData == 1) {
